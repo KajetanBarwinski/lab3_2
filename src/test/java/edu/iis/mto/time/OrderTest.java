@@ -55,4 +55,22 @@ class OrderTest {
 
     }
 
+    @Test
+    public void shouldSetStatusCancelled(){
+        Instant confirmationTime = Instant.parse("2020-12-07T09:00:00Z");
+        Instant submissionTime = Instant.parse("2020-12-06T08:00:00Z");
+        Mockito.when(this.clock.instant()).thenReturn(submissionTime).thenReturn(confirmationTime);
+        Mockito.when(this.clock.getZone()).thenReturn(ZoneId.systemDefault());
+        Order order = new Order(this.clock);
+
+        order.submit();
+        try {
+            order.confirm();
+            fail("Exception was not thrown");
+
+        } catch (OrderExpiredException e) {
+            assertEquals(Order.State.CANCELLED, order.getOrderState());
+        }
+
+    }
 }
