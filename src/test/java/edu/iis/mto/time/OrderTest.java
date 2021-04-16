@@ -39,6 +39,48 @@ class OrderTest {
         order.submit();
         
         assertThrows(OrderExpiredException.class, order::confirm);
-        assertEquals(Order.State.CANCELLED, order.getOrderState());
+        assertEquals(order.getOrderState(), Order.State.CANCELLED);
     }
+    
+    @Test
+    void orderStateShouldBeEqualToConfirmed() {
+    	Instant expiredTime = submittionTime.plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(submittionTime).thenReturn(expiredTime);
+        
+        order.submit();
+        order.confirm();
+        
+        assertEquals(order.getOrderState(), Order.State.CONFIRMED);
+    }
+    
+    @Test
+    void orderStateShouldBeEqualToSubmitted() {
+        when(clock.instant()).thenReturn(submittionTime);
+        
+        order.submit();
+        
+        assertEquals(order.getOrderState(), Order.State.SUBMITTED);
+    }
+    
+    @Test
+    void orderStateShouldBeEqualToRealized() {
+    	Instant expiredTime = submittionTime.plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(submittionTime).thenReturn(expiredTime);
+        
+        order.submit();
+        order.confirm();
+        order.realize();
+        
+        assertEquals(order.getOrderState(), Order.State.REALIZED);
+    }
+    
+    @Test
+    void orderMethodShouldThrowOrderStateException() {
+        when(clock.instant()).thenReturn(submittionTime);
+        
+        order.submit();
+        
+        assertThrows(OrderStateException.class, order::realize);
+    }
+    
 }
