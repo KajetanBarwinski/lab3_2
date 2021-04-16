@@ -24,7 +24,8 @@ class OrderTest {
     private Instant t1;
     private Order order;
     private final long VALUE_GREATER_THAN_VALID_PERIOD_HOUR=25;
-    private final long VALUE_LESS_THAN_VALID_PERIOD_HOUR=24;
+    private final long VALUE_LESS_THAN_VALID_PERIOD_HOUR=23;
+    private final long VALID_PERIOD_HOUR=24;
     @BeforeEach
     void setUp()  {
         t1=Instant.now();
@@ -49,6 +50,15 @@ class OrderTest {
         order.confirm();
         assertThat(order.getOrderState(), Is.is(Order.State.CONFIRMED));
     }
+
+   @Test
+    void testShouldThrowOrderStateException()
+   {
+       when(clock.instant()).thenReturn(t1).thenReturn(t1.plus(VALID_PERIOD_HOUR, ChronoUnit.HOURS));
+       when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+       order.submit();
+       assertThrows(OrderStateException.class, () ->order.realize());
+   }
 
 
 }
