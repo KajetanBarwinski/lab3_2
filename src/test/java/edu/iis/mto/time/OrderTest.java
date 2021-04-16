@@ -96,7 +96,7 @@ class OrderTest {
     }
 
     @Test
-    void expiredOrderStatusSubmited(){
+    void expiredOrderStatusSubmitedAndRealized(){
         Instant startTime = Instant.parse("2015-12-08T10:00:00Z");
 
         Order order = new Order(clock);
@@ -108,6 +108,9 @@ class OrderTest {
 
 
         assertEquals(order.getOrderState(), Order.State.SUBMITTED);
+        order.confirm();
+        order.realize();
+        assertEquals(order.getOrderState(), Order.State.REALIZED);
 
     }
 
