@@ -34,9 +34,6 @@ class OrderTest {
         when(clock.getZone()).thenReturn(ZoneId.systemDefault());
         when(clock.instant()).thenReturn(startTime).thenReturn(endTime);
 
-        OrderItem item = new OrderItem();
-
-        order.addItem(item);
         order.submit();
 
 
