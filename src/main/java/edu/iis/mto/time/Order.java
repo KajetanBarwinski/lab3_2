@@ -26,7 +26,6 @@ public class Order {
 
     public void addItem(OrderItem item) {
         requireState(State.CREATED, State.SUBMITTED);
-
         items.add(item);
         orderState = State.CREATED;
 
@@ -36,13 +35,13 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
+        subbmitionDate = LocalDateTime.now(clock);
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(clock), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
