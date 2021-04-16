@@ -1,8 +1,10 @@
 package edu.iis.mto.time;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Order {
@@ -10,9 +12,15 @@ public class Order {
     private static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
-    private LocalDateTime subbmitionDate;
+    private Instant subbmitionDate;
+    private Clock clock;
 
     public Order() {
+        orderState = State.CREATED;
+    }
+
+    public Order(Clock clock) {
+        this.clock = clock;
         orderState = State.CREATED;
     }
 
@@ -28,13 +36,13 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
+        subbmitionDate = clock.instant();
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = Duration.between(subbmitionDate, clock.instant()).toHours();
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
@@ -58,18 +66,12 @@ public class Order {
             }
         }
 
-        throw new OrderStateException("order should be in state "
-                                      + allowedStates
-                                      + " to perform required  operation, but is in "
-                                      + orderState);
+        throw new OrderStateException(
+                "order should be in state " + Arrays.toString(allowedStates) + " to perform required  operation, but is in " + orderState);
 
     }
 
     public enum State {
-        CREATED,
-        SUBMITTED,
-        CONFIRMED,
-        REALIZED,
-        CANCELLED
+        CREATED, SUBMITTED, CONFIRMED, REALIZED, CANCELLED
     }
 }
