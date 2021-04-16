@@ -30,13 +30,26 @@ class OrderTest {
     }
 
     @Test
-    void orderMethodsShouldSetOrderStateToSubmittedOnNoTimeChange() {
+    void orderMethodsShouldSetOrderStateToConfirmedOnNoTimeChange() {
         when(clock.instant()).thenReturn(startTime);
 
         order.submit();
         order.confirm();
 
         assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
+    void orderMethodsShouldSetOrderStateToRealizedIfConfirmationTimeIsNotExceeded() {
+        Instant noTimeChange = startTime.plus(0, ChronoUnit.HOURS);
+
+        when(clock.instant()).thenReturn(startTime).thenReturn(noTimeChange);
+
+        order.submit();
+        order.confirm();
+        order.realize();
+
+        assertEquals(Order.State.REALIZED, order.getOrderState());
     }
 
     @Test
