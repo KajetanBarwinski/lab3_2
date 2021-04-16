@@ -60,5 +60,14 @@ class OrderTest {
        assertThrows(OrderStateException.class, () ->order.realize());
    }
 
+   @Test
+    void testShouldSetSubmittedStatus()
+   {
+       when(clock.instant()).thenReturn(t1).thenReturn(t1.plus(VALUE_LESS_THAN_VALID_PERIOD_HOUR, ChronoUnit.HOURS));
+       when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+       order.submit();
+       assertThat(order.getOrderState(), Is.is(Order.State.SUBMITTED));
+   }
+
 
 }
