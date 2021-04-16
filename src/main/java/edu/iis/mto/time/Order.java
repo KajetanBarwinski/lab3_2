@@ -1,5 +1,6 @@
 package edu.iis.mto.time;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -11,9 +12,16 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
+    private Clock clock;
 
     public Order() {
+        this.clock=Clock.systemDefaultZone();
         orderState = State.CREATED;
+    }
+
+    public Order(Clock clock) {
+        orderState=State.CREATED;
+        this.clock = clock;
     }
 
     public void addItem(OrderItem item) {
