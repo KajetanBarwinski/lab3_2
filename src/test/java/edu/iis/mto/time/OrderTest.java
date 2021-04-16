@@ -3,6 +3,7 @@ package edu.iis.mto.time;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ class OrderTest {
     void setUp() throws Exception {}
 
     @Test
-    void expiredOrderTest() {
+    void expiredOrderShouldThrownExceptionTest() {
         order = new Order(clock);
 
         Instant submission = Instant.parse("2010-10-10T10:10:10.00Z");
@@ -35,6 +36,20 @@ class OrderTest {
 
         order.submit();
         assertThrows(OrderExpiredException.class, order::confirm);
+    }
+
+    @Test
+    void expiredOrderShouldNotThrownExceptionTest(){
+        order = new Order(clock);
+
+        Instant submission = Instant.parse("2010-10-10T10:10:10.00Z");
+        Instant confirmation = submission.plus(Order.VALID_PERIOD_HOURS, ChronoUnit.HOURS);
+
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(submission).thenReturn(confirmation);
+
+        order.submit();
+        Assertions.assertDoesNotThrow(()->order.confirm());
     }
 
     @Test
@@ -65,8 +80,10 @@ class OrderTest {
         assertThrows(OrderExpiredException.class,()->order.confirm());
         assertEquals(Order.State.CANCELLED,order.getOrderState());
     }
-
-
 }
+
+
+
+
 
 
