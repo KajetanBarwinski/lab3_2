@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Order {
 
+    private FakeClock fakeClock = new FakeClock();
+
     private static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
@@ -14,6 +16,14 @@ public class Order {
 
     public Order() {
         orderState = State.CREATED;
+    }
+
+    public FakeClock getFakeClock() {
+        return this.fakeClock;
+    }
+
+    public void setFakeClock(FakeClock fakeClock) {
+        this.fakeClock = fakeClock;
     }
 
     public void addItem(OrderItem item) {
@@ -28,13 +38,13 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
+        subbmitionDate = LocalDateTime.now(fakeClock);
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(fakeClock), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
