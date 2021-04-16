@@ -50,4 +50,28 @@ class OrderTest {
         order.submit();
         order.confirm();
     }
+
+    @Test
+    void OrderConfirmedAtTheSameTimeAsSubmitting() {
+        Order order = new Order(fakeTime);
+        Mockito.when(fakeTime.getCurrentTime()).thenReturn(
+                LocalDateTime.of(0, 1, 1, 0, 0, 0)
+        );
+
+        order.submit();
+        order.confirm();
+    }
+
+    @Test
+    void CheckIfConfirmAndSubmitAreCheckingTime(){
+        Order order = new Order(fakeTime);
+        Mockito.when(fakeTime.getCurrentTime()).thenReturn(
+                LocalDateTime.of(0, 1, 1, 0, 0, 0)
+        );
+
+        order.submit();
+        order.confirm();
+
+        Mockito.verify(fakeTime, times(2)).getCurrentTime();
+    }
 }
