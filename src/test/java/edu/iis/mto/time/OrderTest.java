@@ -43,4 +43,39 @@ class OrderTest {
         assertThrows(OrderExpiredException.class, order::confirm);
     }
 
+    @Test
+    void expiredOrderStatusTest(){
+        Instant startTime = Instant.parse("2015-12-08T10:00:00Z");
+
+        Order order = new Order(clock);
+        Instant endTime = startTime.plus(Order.VALID_PERIOD_HOURS + 1, ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(startTime).thenReturn(endTime);
+
+        order.submit();
+
+        try {
+            order.confirm();
+        }catch (OrderExpiredException e)
+        {
+            assertEquals(order.getOrderState(), Order.State.CANCELLED);
+        }
+    }
+
+    @Test
+    void expiredOrderStatusConfirmed(){
+        Instant startTime = Instant.parse("2015-12-08T10:00:00Z");
+
+        Order order = new Order(clock);
+        Instant endTime = startTime.plus(Order.VALID_PERIOD_HOURS , ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(startTime).thenReturn(endTime);
+
+        order.submit();
+        order.confirm();
+
+        assertEquals(order.getOrderState(), Order.State.CONFIRMED);
+
+    }
+
 }
