@@ -73,4 +73,24 @@ class OrderTest {
         }
 
     }
+
+    @Test
+    public void shouldSetStatusConfirmed(){
+        Instant confirmationTime = Instant.parse("2020-12-06T09:00:00Z");
+        Instant submissionTime = Instant.parse("2020-12-06T08:00:00Z");
+        Mockito.when(this.clock.instant()).thenReturn(submissionTime).thenReturn(confirmationTime);
+        Mockito.when(this.clock.getZone()).thenReturn(ZoneId.systemDefault());
+        Order order = new Order(this.clock);
+
+        order.submit();
+        try {
+            order.confirm();
+            assertEquals(Order.State.CONFIRMED, order.getOrderState());
+
+        } catch (OrderExpiredException e) {
+            fail("Exception was not thrown");
+
+        }
+
+    }
 }
