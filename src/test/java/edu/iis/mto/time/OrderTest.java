@@ -30,12 +30,23 @@ class OrderTest {
     }
 
     @Test
+    void orderMethodsShouldSetOrderStateToSubmittedOnNoTimeChange() {
+        when(clock.instant()).thenReturn(startTime);
+
+        order.submit();
+        order.confirm();
+
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
     void confirmShouldThrowExceptionIfConfirmationTimeIsExceeded() {
         Instant timeExceeded = startTime.plus(25, ChronoUnit.HOURS);
 
         when(clock.instant()).thenReturn(startTime).thenReturn(timeExceeded);
 
         order.submit();
+
         assertThrows(OrderExpiredException.class, order::confirm);
         assertEquals(Order.State.CANCELLED, order.getOrderState());
     }
