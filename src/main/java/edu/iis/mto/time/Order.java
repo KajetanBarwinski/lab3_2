@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Order {
 
-    private static final long VALID_PERIOD_HOURS = 24;
+    public static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
@@ -28,7 +28,6 @@ public class Order {
         requireState(State.CREATED, State.SUBMITTED);
         items.add(item);
         orderState = State.CREATED;
-
     }
 
     public void submit() {
