@@ -29,7 +29,7 @@ class OrderTest {
     }
 
     @Test
-    void ThrowOrderExpiredExceptionTest() {
+    void ExpiredAndCanceledTest() {
         Instant submissionTime = Instant.EPOCH;
         Instant confirmationTime = submissionTime.plus(INVALID_PERIOD_HOURS, ChronoUnit.HOURS);
         Order.State expectedState = Order.State.CANCELLED;
@@ -61,4 +61,15 @@ class OrderTest {
         assertEquals(Order.State.CONFIRMED, order.getOrderState());
     }
 
+    @Test
+    void ThrowOrderExpiredExceptionTest() {
+        Instant submissionTime = Instant.EPOCH;
+        Instant confirmationTime = submissionTime.plus(INVALID_PERIOD_HOURS, ChronoUnit.HOURS);
+
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(submissionTime).thenReturn(confirmationTime);
+        order.submit();
+
+        assertThrows(OrderExpiredException.class,()->order.confirm());
+    }
 }
