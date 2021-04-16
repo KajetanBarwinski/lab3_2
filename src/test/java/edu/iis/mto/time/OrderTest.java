@@ -51,6 +51,20 @@ class OrderTest {
         assertEquals(order.getOrderState(), Order.State.CONFIRMED);
     }
 
+    @Test
+    void orderStateShouldBeCancelledTest() {
+        order = new Order(clock);
+        Instant start = Instant.parse("2014-02-01T03:00:00.00Z");
+        Instant end = start.plus(28, ChronoUnit.HOURS);
+
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(start).thenReturn(end);
+
+        order.submit();
+
+        assertThrows(OrderExpiredException.class,()->order.confirm());
+        assertEquals(Order.State.CANCELLED,order.getOrderState());
+    }
 
 
 }
