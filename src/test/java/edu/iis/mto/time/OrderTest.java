@@ -72,4 +72,15 @@ class OrderTest {
 
         assertThrows(OrderExpiredException.class,()->order.confirm());
     }
+    @Test
+    void DontThrowOrderExpiredExceptionTest() {
+        Instant submissionTime = Instant.EPOCH;
+        Instant confirmationTime = submissionTime.plus(order.VALID_PERIOD_HOURS, ChronoUnit.HOURS);
+
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(submissionTime).thenReturn(confirmationTime);
+        order.submit();
+
+        assertDoesNotThrow(()->order.confirm());
+    }
 }
