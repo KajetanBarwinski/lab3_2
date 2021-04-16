@@ -37,4 +37,14 @@ class OrderTest {
         assertEquals(order.getOrderState(), Order.State.CANCELLED);
     }
 
+    @Test
+    void checkIfOrderCanBeConfirmedInValidTimeRange()
+    {
+        Instant submission = Instant.now();
+        Instant confirmation = submission.plus(2, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(submission).thenReturn(confirmation);
+        order.submit();
+        order.confirm();
+        assertEquals(order.getOrderState(), Order.State.CONFIRMED);
+    }
 }
