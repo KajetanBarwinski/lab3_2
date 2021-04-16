@@ -45,4 +45,20 @@ class OrderTest {
         assertEquals(expectedState, order.getOrderState());
     }
 
+    @Test
+    void SuccessAndConfirmStatusTest() {
+        Instant submissionTime = Instant.EPOCH;
+        Instant confirmationTime = submissionTime.plus(order.VALID_PERIOD_HOURS, ChronoUnit.HOURS);
+
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(submissionTime).thenReturn(confirmationTime);
+        order.submit();
+
+        try{
+            order.confirm();
+        }catch (RuntimeException ignored){}
+
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
 }
