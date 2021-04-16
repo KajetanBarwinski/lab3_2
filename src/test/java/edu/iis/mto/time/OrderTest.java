@@ -114,4 +114,20 @@ class OrderTest {
 
     }
 
+    @Test
+    void expiredOrderStatusExceptionBadStatusToOperation() {
+
+        Instant startTime = Instant.parse("2015-12-08T10:00:00Z");
+
+        Order order = new Order(clock);
+        Instant endTime = startTime.plus(Order.VALID_PERIOD_HOURS, ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(startTime).thenReturn(endTime);
+
+        order.submit();
+
+
+        assertThrows(OrderStateException.class, order::realize);
+    }
+
 }
