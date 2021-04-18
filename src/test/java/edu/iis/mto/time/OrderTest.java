@@ -41,6 +41,7 @@ class OrderTest {
 
         //Then
         assertThrows(OrderExpiredException.class, order::confirm);
+        assertEquals(Order.State.CANCELLED, order.getOrderState());
     }
 
     @Test
@@ -54,6 +55,7 @@ class OrderTest {
 
         //Then
         assertThrows(OrderExpiredException.class, order::confirm);
+        assertEquals(Order.State.CANCELLED, order.getOrderState());
     }
 
 }
