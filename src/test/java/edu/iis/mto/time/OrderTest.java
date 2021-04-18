@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +26,7 @@ class OrderTest {
 
     @BeforeEach
     void setUp() {
-        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        lenient().when(clock.getZone()).thenReturn(ZoneId.systemDefault());
         order = new Order(clock);
         correct = Instant.now();
     }
@@ -56,6 +57,79 @@ class OrderTest {
         //Then
         assertThrows(OrderExpiredException.class, order::confirm);
         assertEquals(Order.State.CANCELLED, order.getOrderState());
+    }
+
+    @Test
+    void shouldThrowOrderStateException_ConfirmMethodWithCreatedState() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+
+        try {
+            order.confirm();
+            fail("Method should throw OrderStateException");
+        } catch (OrderStateException ignored) {}
+    }
+
+    @Test
+    void shouldThrowOrderStateException_SubmitMethodWithSubmittedState() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+
+        //Then
+        assertThrows(OrderStateException.class, order::submit);
+    }
+
+    @Test
+    void shouldThrowOrderStateException_SubmitMethodWithConfirmedState() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+        order.confirm();
+
+        //Then
+        assertThrows(OrderStateException.class, order::submit);
+    }
+
+    @Test
+    void shouldThrowOrderStateException_AddItemMethodWithConfirmedState() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+        order.confirm();
+
+        //Then
+        try {
+            order.addItem(new OrderItem());
+            fail("Method should throw OrderStateException");
+        } catch (OrderStateException ignored) {}
+    }
+
+    @Test
+    void shouldThrowOrderStateException_RealizeMethodWithSubmittedState() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+
+        //Then
+        assertThrows(OrderStateException.class, order::realize);
+    }
+
+    @Test
+    void shouldThrowOrderStateException_RealizeMethodWithCreatedState() {
+        assertThrows(OrderStateException.class, order::realize);
     }
 
     @Test
