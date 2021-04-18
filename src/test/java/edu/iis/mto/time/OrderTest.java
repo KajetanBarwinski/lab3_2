@@ -184,4 +184,62 @@ class OrderTest {
         assertEquals(Order.State.SUBMITTED, order.getOrderState());
     }
 
+    @Test
+    void shouldConfirmOrder_TwentyHoursElapsed() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+        order.confirm();
+
+        //Then
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
+    void shouldConfirmOrder_TenHoursElapsed() {
+        //Given
+        Instant exceed = Instant.now().plus(10, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+        order.confirm();
+
+        //Then
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
+    void shouldRealizeOrder_TwentyHoursElapsed() {
+        //Given
+        Instant exceed = Instant.now().plus(20, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+        order.confirm();
+        order.realize();
+
+        //Then
+        assertEquals(Order.State.REALIZED, order.getOrderState());
+    }
+
+    @Test
+    void shouldRealizeOrder_TenHoursElapsed() {
+        //Given
+        Instant exceed = Instant.now().plus(10, ChronoUnit.HOURS);
+        when(clock.instant()).thenReturn(correct).thenReturn(exceed);
+
+        //When
+        order.submit();
+        order.confirm();
+        order.realize();
+
+        //Then
+        assertEquals(Order.State.REALIZED, order.getOrderState());
+    }
+
 }
