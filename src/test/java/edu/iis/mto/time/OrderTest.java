@@ -77,4 +77,17 @@ class OrderTest {
 
         assertEquals(order.getOrderState(), Order.State.CONFIRMED);;
     }
+
+    @Test
+    void ConfirmationInValidTimeStateTest() {
+        Order order = new Order(clock);
+        Instant endTime = now.plus( 24, ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(now).thenReturn(endTime);
+
+        order.submit();
+        order.confirm();
+
+        assertEquals(order.getOrderState(), Order.State.CONFIRMED);;
+    }
 }
