@@ -38,4 +38,17 @@ class OrderTest {
         assertThrows(OrderExpiredException.class, () -> order.confirm());
     }
 
+    @Test
+    void OrderStateTestInValidTime() {
+        Order order = new Order(clock);
+        Instant endTime = now.plus( 24, ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(now).thenReturn(endTime);
+
+        order.submit();
+
+        assertEquals(order.getOrderState(), Order.State.SUBMITTED);
+    }
+
+
 }
