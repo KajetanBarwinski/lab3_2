@@ -7,13 +7,16 @@ import java.util.List;
 
 public class Order {
 
+    private CustomDateTime dateTime;
+
     private static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
 
-    public Order() {
+    public Order(CustomDateTime dateTime) {
         orderState = State.CREATED;
+        this.dateTime = dateTime;
     }
 
     public void addItem(OrderItem item) {
@@ -34,7 +37,7 @@ public class Order {
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(dateTime.getTime(), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
