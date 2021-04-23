@@ -50,5 +50,19 @@ class OrderTest {
         assertEquals(order.getOrderState(), Order.State.SUBMITTED);
     }
 
+    @Test
+    void ConfirmationAfterTimeStateTest() {
+        Order order = new Order(clock);
+        Instant endTime = now.plus( 25, ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(now).thenReturn(endTime);
 
+        order.submit();
+        try{
+            order.confirm();
+        }catch (Exception e){
+            assertEquals(order.getOrderState(), Order.State.CANCELLED);;
+        }
+
+    }
 }
