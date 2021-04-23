@@ -63,6 +63,18 @@ class OrderTest {
         }catch (Exception e){
             assertEquals(order.getOrderState(), Order.State.CANCELLED);;
         }
+    }
 
+    @Test
+    void ConfirmationBeforeTimeStateTest() {
+        Order order = new Order(clock);
+        Instant endTime = now.plus( 23, ChronoUnit.HOURS);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        when(clock.instant()).thenReturn(now).thenReturn(endTime);
+
+        order.submit();
+        order.confirm();
+
+        assertEquals(order.getOrderState(), Order.State.CONFIRMED);;
     }
 }
