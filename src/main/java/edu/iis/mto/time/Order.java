@@ -11,16 +11,16 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
-    private final OrderClock orderClock;
+    private final ClockInterface orderClock;
 
     public Order() {
         orderState = State.CREATED;
         orderClock=new OrderClock();
     }
 
-    public Order(OrderClock orderClock) {
+    public Order(ClockInterface clock) {
         orderState = State.CREATED;
-        this.orderClock = orderClock;
+        this.orderClock = clock;
     }
 
     public void addItem(OrderItem item) {
@@ -41,6 +41,7 @@ public class Order {
 
     public void confirm() {
         requireState(State.SUBMITTED);
+        LocalDateTime test=orderClock.getTime();
         long hoursElapsedAfterSubmittion = subbmitionDate.until(orderClock.getTime(), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
